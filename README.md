@@ -1,27 +1,53 @@
-![](https://github.com/cor0nius/learn-cicd-starter/actions/workflows/ci.yml/badge.svg)
+# Notely - CI/CD Pipeline Project
 
-# learn-cicd-starter (Notely)
+This repository contains the "Notely" application, a Go web server that was used as the foundation for the ["Learn CI/CD with GitHub Actions, Docker and Go"](https://www.boot.dev/) course on boot.dev.
 
-This repo contains the starter code for the "Notely" application for the "Learn CICD" course on [Boot.dev](https://boot.dev).
+The primary goal of this project was not to build the application itself, but to design and implement a complete Continuous Integration (CI) and Continuous Deployment (CD) pipeline for it using modern DevOps tools.
 
-## Local Development
+## The CI/CD Pipeline
 
-Make sure you're on Go version 1.22+.
+A full CI/CD pipeline was built using GitHub Actions to automate the testing, building, and deployment of the application.
 
-Create a `.env` file in the root of the project with the following contents:
+### Continuous Integration (CI)
 
-```bash
-PORT="8080"
-```
+The CI pipeline (`ci.yml`) is triggered on every pull request to the `main` branch. It runs a series of checks to ensure code quality and stability before any code is merged.
 
-Run the server:
+**CI Jobs:**
+*   **Tests:**
+    *   Checks out the code.
+    *   Runs the full suite of unit tests using `go test`.
+    *   Performs a security scan on the codebase using `gosec` to identify potential vulnerabilities.
+*   **Style:**
+    *   Ensures all Go code is formatted correctly according to `gofmt` standards.
+    *   Runs a comprehensive linting check using `staticcheck` to enforce code quality and best practices.
 
-```bash
-go build -o notely && ./notely
-```
+### Continuous Deployment (CD)
 
-*This starts the server in non-database mode.* It will serve a simple webpage at `http://localhost:8080`.
+The CD pipeline (`cd.yml`) is triggered on every push to the `main` branch, automatically deploying the new version of the application.
 
-You do *not* need to set up a database or any interactivity on the webpage yet. Instructions for that will come later in the course!
+**Deployment Steps:**
+1.  **Build:** Compiles the Go application into a production-ready binary.
+2.  **Authenticate with GCP:** Securely authenticates with Google Cloud Platform using stored secrets.
+3.  **Build & Push Docker Image:**
+    *   Builds a lightweight, production-ready Docker image using the provided `Dockerfile`.
+    *   Pushes the new image to Google Artifact Registry.
+4.  **Database Migration:** Runs database migrations using `goose` to ensure the database schema is up-to-date before deploying the new code.
+5.  **Deploy to Cloud Run:** Deploys the newly built Docker image to Google Cloud Run, making the updated application live.
 
-Cor0nius's version of Boot.dev's Notely app.
+## Key DevOps & CI/CD Skills Learned
+
+*   **GitHub Actions:**
+    *   Authored complex CI/CD workflows from scratch using YAML.
+    *   Configured jobs to run on specific triggers (pull requests, pushes).
+    *   Used community actions (`actions/checkout`, `actions/setup-go`, etc.) to build efficient pipelines.
+    *   Managed secrets for securely authenticating with cloud providers.
+*   **Docker:**
+    *   Wrote a `Dockerfile` to containerize a Go application for consistent, portable deployments.
+    *   Built and pushed Docker images to a container registry (Google Artifact Registry).
+*   **Cloud Deployment (Google Cloud Run):**
+    *   Automated the deployment of a containerized application to a serverless platform.
+    *   Managed application configuration and scaling settings through deployment commands.
+*   **Automated Quality Gates:**
+    *   Integrated automated testing, linting, formatting, and security scanning into the development lifecycle to maintain high code quality.
+*   **Database Migrations:**
+    *   Incorporated automated database schema migrations into the deployment process to ensure consistency between the application and its database.
